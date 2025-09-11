@@ -117,8 +117,8 @@ nav {
   display: flex; gap: 10px; 
   flex-wrap: wrap;
 }
-.feature {
-  background: rgba(255,255,255,0.02);
+.feature, a {
+  background: rgba(8, 28, 175, 0.88);
   padding: 12px; 
   border-radius: 12px;
   min-width: 150px;
@@ -401,3 +401,84 @@ footer {
 /*kushus background musik latar kewibuan anda*/
 
 /*anime goyang entot dita afifah, vagina nya sangat mantap ayang beb ku*/
+.anime-list details {
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 12px;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.anime-list details:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.anime-list summary {
+  font-size: 18px;
+  font-weight: 600;
+  color: #60a5fa;
+  list-style: none;
+  outline: none;
+}
+
+.anime-list summary::-webkit-details-marker {
+  display: none; /* hilangkan marker default */
+}
+
+.anime-list h3.small {
+  font-size: 14px;
+  color: #e6eef8;
+  margin: 4px 0 0 10px;
+}
+
+/*drop down anime list cuy*/
+        .anime-list {
+          max-width: 600px;
+          margin: 20px auto;
+          font-family: 'Inter', sans-serif;
+        }
+        
+        .dropdown {
+          margin-bottom: 12px;
+          border-radius: 12px;
+          overflow: hidden;
+          background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .dropbtn {
+          width: 100%;
+          padding: 12px 16px;
+          background: transparent;
+          border: none;
+          text-align: left;
+          font-size: 18px;
+          font-weight: 600;
+          color: #60a5fa;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: background 0.3s;
+        }
+        
+        .dropbtn:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .arrow {
+          transition: transform 0.3s;
+        }
+        
+        .dropcontent {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.5s ease;
+          padding: 0 16px;
+        }
+        
+        .dropcontent h3.small {
+          font-size: 14px;
+          color: #BCBABA;
+          margin: 4px 0;
+        }

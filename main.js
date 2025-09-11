@@ -44,4 +44,22 @@ let fade = setInterval(() => {
 }, 200); // naik perlahan tiap 200ms
 
 
-// anime goyang
+// adrop down list anime
+const dropdowns = document.querySelectorAll('.dropdown');
+
+dropdowns.forEach(drop => {
+        const btn = drop.querySelector('.dropbtn');
+        const content = drop.querySelector('.dropcontent');
+        const arrow = drop.querySelector('.arrow');
+        
+        btn.addEventListener('click', () => {
+                const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+                if (isOpen) {
+                        content.style.maxHeight = '0';
+                        arrow.style.transform = 'rotate(0deg)';
+                } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        arrow.style.transform = 'rotate(180deg)';
+                }
+        });
+});
