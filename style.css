@@ -482,3 +482,15 @@ footer {
           color: #BCBABA;
           margin: 4px 0;
         }
+        
+        
+        /* ===== VIDEO CONTAINER ===== */
+
+.video-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 10px auto;
+  text-align: center;
+  position: relative;
+  
+}
