@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  
   <div class="container">
     <!-- ===== HEADER ===== -->
     <header>
@@ -25,6 +26,7 @@
       </div>
       <nav>
 <!-- navbar kosong  -->
+
       </nav>
     </header>
 
@@ -59,6 +61,26 @@
         </audio>
         
         <!-- selesai boss -->
+  <!-- ICON NOTIF -->
+  <div class="notif-container">
+    <div class="notif-icon" onclick="openNotif()">🔔
+      <span id="notif-badge" class="notif-badge" style="display:none;"></span>
+    </div>
+  </div>
+  
+  <!-- MODAL -->
+  <div id="notifModal" class="notif-modal">
+    <div class="notif-card">
+      <div class="notif-header">
+        <h3>Notifikasi</h3>
+        <span class="close-btn" onclick="closeNotif()">×</span>
+      </div>
+<div class="notif-body" id="notif-list">
+        <p style="color:gray;">Tidak ada notifikasi</p>
+      </div>
+    </div>
+  </div>
+  <audio id="notifSound" src="notif.mp3" preload="auto"></audio>
         <!-- card postinga -->
 <div class="card-3">
   <h3>INST2-RMX<span class="badge-3">Lagi Hott🔥</span></h3>

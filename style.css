@@ -536,4 +536,137 @@ footer {
     font-weight: bold;
   }
   
- 
+ /*notifikasi css*/
+ /* Container icon */
+.notif-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Icon lonceng */
+.notif-icon {
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  background: #1e1e2f;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s, background 0.2s;
+}
+.notif-icon:hover {
+  transform: scale(1.1);
+  background: #2a2a3d;
+}
+
+/* Badge angka */
+.notif-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ff3b30;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Modal background */
+.notif-modal {
+  display: none;
+  position: fixed;
+  z-index: 1100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+}
+
+/* Card notif */
+.notif-card {
+  background: #181818;
+  margin: 80px auto;
+  padding: 0;
+  border-radius: 14px;
+  width: 92%;
+  max-width: 420px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  animation: slideDown 0.3s ease;
+  overflow: hidden;
+}
+
+/* Header */
+.notif-header {
+  background: #1C1C40;
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notif-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.close-btn {
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+.close-btn:hover {
+  transform: scale(1.2);
+}
+
+/* List */
+.notif-body {
+  max-height: 320px;
+  overflow-y: auto;
+  background: #464973;
+}
+.notif-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid #1B2467;
+  transition: background 0.2s;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;   /* biar teks panjang turun */
+  white-space: normal;     /* jangan satu baris paksa */
+}
+.notif-item:hover {
+  background: #353594;
+}
+.notif-item a {
+  text-decoration: none;
+  color: #DDDDDD;
+  font-weight: bold;
+  display: block; /* biar teks panjang full 1 blok */
+}
+.notif-item a:hover {
+  text-decoration: underline;
+}
+
+/* Animasi */
+@keyframes slideDown {
+  from { transform: translateY(-40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Scrollbar custom */
+.notif-body::-webkit-scrollbar {
+  width: 6px;
+}
+.notif-body::-webkit-scrollbar-thumb {
+  background: #00B9DB;
+  border-radius: 4px;
+}
+.notif-body::-webkit-scrollbar-thumb:hover {
+  background: #262C81;
+}
