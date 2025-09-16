@@ -122,7 +122,7 @@ async function loadNotif() {
 // load pertama
 document.addEventListener("DOMContentLoaded", loadNotif);
 // refresh tiap 30 detik
-setInterval(loadNotif, 30000);
+setInterval(loadNotif, 1000);
 
 // buka / tutup modal
 function openNotif() {
