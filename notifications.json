@@ -1,51 +1,17 @@
 [
-  { 
-    "text": "Episode baru One Piece rilis hari ini! Jangan ketinggalan aksi Luffy dan kru Topi Jerami.", 
-    "link": "https://contoh.com/onepiece", 
-    "expire": 24,
-    "enabled": true,
-    "created": "2025-09-16T05:00:00Z"
-  },
-  { 
-    "text": "Kata-kata hari ini: Tetap semangat! Hidup itu seperti anime shounen, penuh rintangan tapi selalu ada jalan.", 
-    "link": "#", 
-    "expire": 0, 
-    "enabled": true,
-    "created": "2025-09-16T06:00:00Z"
-  },
-  {
-    "text": "Rekomendasi Anime: Yuru Camp - Nikmati keseruan camping musim dingin bersama Nadeshiko, Rin, dan teman-temannya. Anime ini penuh momen slice-of-life yang menenangkan, dengan pemandangan alam indah serta suasana persahabatan yang hangat.", 
-    "link": "#yuru-camp",
-    "expire": 24,
-    "enabled": true,
-    "created": "2025-09-16T07:00:00Z"
-  },
-  {
-    "text": "Rekomendasi Anime: KonoSuba - Petualangan kocak Kazuma, Aqua, Megumin, dan Darkness yang penuh dengan tawa dan kekonyolan.", 
-    "link": "#konosuba",
-    "expire": 24,
-    "enabled": true,
-    "created": "2025-09-16T08:00:00Z"
-  },
-  {
-    "text": "Rekomendasi Anime: Mushoku Tensei - Cerita isekai penuh perjuangan, pertumbuhan diri, dan dunia fantasi yang kompleks.", 
-    "link": "#mushoku-tensei",
-    "expire": 24,
-    "enabled": true,
-    "created": "2025-09-16T09:00:00Z"
-  },
-  {
-    "text": "Rekomendasi Anime: Violet Evergarden - Kisah emosional seorang gadis yang belajar memahami makna cinta dan perasaan manusia melalui surat.", 
-    "link": "#violet-evergarden",
-    "expire": 24,
-    "enabled": true,
-    "created": "2025-09-16T10:00:00Z"
-  }, 
+ 
     {
-    "text": "tes lur notif nya bolo hehe😏",
+    "text": "tes lur notif nya bolo hehe",
     "link": "#violet-evergarden",
     "expire": 1,
     "enabled": true,
     "created": "2025-09-16T10:00:00Z"
-  }
+  }, 
+  {
+  "text": "tes lur notif nya bolo hehe",
+  "link": "#violet-evergarden",
+  "expire": 1,
+  "enabled": true,
+  "created": "2025-09-16T10:00:00Z"
+}
 ]
