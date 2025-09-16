@@ -154,3 +154,17 @@ function showNotification(message) {
         
         setTimeout(() => notif.remove(), 5000);
 }
+
+
+if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[SW] Registered', reg))
+                .catch(err => console.error('[SW] Failed', err));
+}
+
+// request permission notif
+if ('Notification' in window && Notification.permission !== 'granted') {
+        Notification.requestPermission().then(permission => {
+                console.log('Notification permission:', permission);
+        });
+}
