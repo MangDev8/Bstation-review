@@ -63,3 +63,17 @@ dropdowns.forEach(drop => {
                 }
         });
 });
+
+
+
+//update version cide
+
+setInterval(async () => {
+        const res = await fetch("/version.json?_=" + Date.now());
+        const { version } = await res.json();
+        
+        if (localStorage.getItem("version") !== version) {
+                localStorage.setItem("version", version);
+                window.location.reload();
+        }
+}, 10000);
