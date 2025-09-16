@@ -9,7 +9,6 @@ function playMusic() {
                 bubble.classList.add("playing");
                 isPlaying = true;
                 
-                // fade in volume
                 let volume = 0.0;
                 music.volume = volume;
                 const fade = setInterval(() => {
@@ -20,9 +19,7 @@ function playMusic() {
                                 clearInterval(fade);
                         }
                 }, 200);
-        }).catch(() => {
-                console.log("Autoplay diblokir, klik balon untuk nyalain musik.");
-        });
+        }).catch(() => console.log("Autoplay diblokir, klik balon untuk nyalain musik."));
 }
 
 function pauseMusic() {
@@ -32,36 +29,21 @@ function pauseMusic() {
         isPlaying = false;
 }
 
-bubble.addEventListener("click", () => {
-        if (!isPlaying) {
-                playMusic();
-        } else {
-                pauseMusic();
-        }
-});
-
+bubble.addEventListener("click", () => isPlaying ? pauseMusic() : playMusic());
 document.addEventListener("DOMContentLoaded", playMusic);
 
-
-// ================= DROPDOWN LIST ANIME =================
-const dropdowns = document.querySelectorAll('.dropdown');
-dropdowns.forEach(drop => {
+// ================= DROPDOWN =================
+document.querySelectorAll('.dropdown').forEach(drop => {
         const btn = drop.querySelector('.dropbtn');
         const content = drop.querySelector('.dropcontent');
         const arrow = drop.querySelector('.arrow');
         
         btn.addEventListener('click', () => {
                 const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-                if (isOpen) {
-                        content.style.maxHeight = '0';
-                        arrow.style.transform = 'rotate(0deg)';
-                } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        arrow.style.transform = 'rotate(180deg)';
-                }
+                content.style.maxHeight = isOpen ? '0' : content.scrollHeight + 'px';
+                arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
         });
 });
-
 
 // ================= AUTO UPDATE VERSION =================
 setInterval(async () => {
@@ -79,16 +61,18 @@ setInterval(async () => {
         }
 }, 10000);
 
-
 // ================= NOTIFIKASI =================
+const notifSound = document.getElementById("notifSound"); // jangan lupa tambahkan di HTML
+const badge = document.getElementById("notif-badge");
+const listEl = document.getElementById("notif-list");
+let lastNotifKeys = new Set();
+
 async function loadNotif() {
         try {
                 const res = await fetch("/notifications.json?_=" + Date.now());
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 let data = await res.json();
                 const now = Date.now();
-                
-                console.log("Notif JSON asli:", data);
                 
                 // filter notif aktif & belum expired
                 data = data.filter(item => {
@@ -107,10 +91,7 @@ async function loadNotif() {
                         return true;
                 });
                 
-                console.log("Notif setelah filter:", data);
-                
                 // update badge
-                const badge = document.getElementById("notif-badge");
                 if (data.length > 0) {
                         badge.textContent = data.length;
                         badge.style.display = "inline-block";
@@ -119,92 +100,57 @@ async function loadNotif() {
                 }
                 
                 // render list
-                const listHTML = data.length ?
+                listEl.innerHTML = data.length ?
                         data.map(item => `<li class="notif-item"><a href="${item.link}" target="_blank">${item.text}</a></li>`).join("") :
                         "<li>Tidak ada notifikasi</li>";
-                const listEl = document.getElementById("notif-list");
-                if (listEl) {
-                        listEl.innerHTML = listHTML;
-                } else {
-                        console.warn("Element #notif-list tidak ditemukan di DOM!");
-                }
+                
+                // cek notif baru untuk suara / toast
+                data.forEach(item => {
+                        const key = "notif_" + btoa(item.text);
+                        if (!lastNotifKeys.has(key)) {
+                                showNotification(item.text);
+                                lastNotifKeys.add(key);
+                        }
+                });
                 
         } catch (e) {
                 console.error("Gagal load notifikasi", e);
-                const listEl = document.getElementById("notif-list");
-                if (listEl) listEl.innerHTML = "<li>Error load</li>";
+                listEl.innerHTML = "<li>Error load</li>";
         }
 }
 
-// load pertama kali setelah DOM siap
+// load pertama
 document.addEventListener("DOMContentLoaded", loadNotif);
-
 // refresh tiap 30 detik
 setInterval(loadNotif, 30000);
 
+// buka / tutup modal
 function openNotif() {
-        const modal = document.getElementById("notifModal");
-        if (modal) modal.style.display = "flex";
+        document.getElementById("notifModal").style.display = "flex";
+        badge.style.display = "none";
+        badge.textContent = "";
 }
 
 function closeNotif() {
-        const modal = document.getElementById("notifModal");
-        if (modal) modal.style.display = "none";
+        document.getElementById("notifModal").style.display = "none";
 }
 
-// tutup modal kalau klik luar card
 window.addEventListener("click", e => {
         const modal = document.getElementById("notifModal");
-        if (modal && e.target === modal) {
-                modal.style.display = "none";
-        }
+        if (modal && e.target === modal) closeNotif();
 });
 
-
-// buka modal notif
-function openNotif() {
-        const modal = document.getElementById("notifModal");
-        const badge = document.getElementById("notif-badge");
-        
-        if (modal) modal.style.display = "flex";
-        
-        // reset badge saat dibuka
-        if (badge) {
-                badge.style.display = "none";
-                badge.textContent = "";
-        }
-}
-
-// update badge
-const badge = document.getElementById("notif-badge");
-if (data.length > 0) {
-        badge.textContent = data.length;
-        badge.style.display = "inline-block";
-} else {
-        badge.style.display = "none";
-}
-
-//suara notifikasi
-const notifSound = document.getElementById("notifSound");
-
+// ================= TOAST NOTIF =================
 function showNotification(message) {
-        // Contoh notifikasi visual
         const notif = document.createElement("div");
-        notif.className = "notif-container";
+        notif.className = "notif-toast";
         notif.textContent = message;
         document.body.appendChild(notif);
         
-        // Set volume sebelum mainkan
-        notifSound.volume = 0.5; // 50% volume
-        notifSound.play().catch(err => {
-                console.log("Gagal mainkan audio:", err);
-        });
+        if (notifSound) {
+                notifSound.volume = 0.5;
+                notifSound.play().catch(err => console.log("Gagal mainkan audio:", err));
+        }
         
-        // Hapus notifikasi setelah 5 detik
-        setTimeout(() => {
-                notif.remove();
-        }, 5000);
+        setTimeout(() => notif.remove(), 5000);
 }
-
-// Contoh panggilan
-showNotification("Pesan baru masuk!");
