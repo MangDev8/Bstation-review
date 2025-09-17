@@ -45,15 +45,8 @@ const music = document.getElementById("bgMusic");
 let isPlaying = false;
 let userInteracted = false;
 
-// pastikan musik & notif audio sudah bisa di-play
 music.addEventListener('canplaythrough', () => console.log("Audio musik siap dimainkan"));
-const notifSound = document.getElementById("notifSound");
-notifSound.addEventListener('canplaythrough', () => console.log("Audio notif siap dimainkan"));
 
-// User gesture pertama
-document.addEventListener('click', () => { userInteracted = true; }, { once: true });
-
-// fade in / fade out
 function fadeIn(audio, targetVolume = 0.3, step = 0.01, interval = 200) {
     audio.volume = 0;
     audio.play().catch(() => console.log("Audio play diblokir browser"));
@@ -62,6 +55,7 @@ function fadeIn(audio, targetVolume = 0.3, step = 0.01, interval = 200) {
         else clearInterval(fade);
     }, interval);
 }
+
 function fadeOut(audio, step = 0.01, interval = 200, callback) {
     const fade = setInterval(() => {
         if (audio.volume > 0) audio.volume = Math.max(audio.volume - step, 0);
@@ -88,35 +82,24 @@ document.querySelectorAll('.dropdown').forEach(drop => {
 });
 
 // ================== NOTIFIKASI ==================
+let lastNotifKeys = new Set(JSON.parse(localStorage.getItem("lastNotifKeys") || "[]"));
+let pendingNotifs = [];
+const notifSound = document.getElementById("notifSound");
 const badge = document.getElementById("notif-badge");
 const listEl = document.getElementById("notif-list");
-let lastNotifKeys = new Set();
 
-async function loadNotif() {
-    try {
-        const res = await fetch("/notifications.json?_=" + Date.now());
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        let data = await res.json();
-        const now = Date.now();
+// User gesture pertama
+document.addEventListener('click', () => {
+    userInteracted = true;
+    pendingNotifs.forEach(() => playNotifSound());
+    pendingNotifs = [];
+}, { once: true });
 
-        data = data.filter(item => item.enabled && (!item.expire || (now - (localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire));
-
-        badge.style.display = data.length > 0 ? 'inline-block' : 'none';
-        badge.textContent = data.length || "";
-
-        listEl.innerHTML = data.length ? data.map(item => `<li class="notif-item"><a href="${item.link || '#'}" target="_blank">${item.text}</a></li>`).join("") : "<li>Tidak ada notifikasi</li>";
-
-        data.forEach(item => {
-            const key = "notif_" + btoa(item.text);
-            if (!lastNotifKeys.has(key)) {
-                showNotification(item.text);
-                lastNotifKeys.add(key);
-            }
-        });
-    } catch (e) {
-        console.error("Gagal load notifikasi", e);
-        listEl.innerHTML = "<li>Error load</li>";
-    }
+function playNotifSound() {
+    if (!notifSound) return;
+    notifSound.volume = 0.5;
+    notifSound.currentTime = 0;
+    notifSound.play().catch(() => console.log("Audio notif diblokir oleh browser"));
 }
 
 function showNotification(message) {
@@ -125,17 +108,54 @@ function showNotification(message) {
     div.textContent = message;
     document.body.appendChild(div);
 
-    if (notifSound && userInteracted) {
-        notifSound.volume = 0.5;
-        notifSound.play().catch(() => console.log("Audio notif diblokir oleh browser"));
+    if (userInteracted) {
+        playNotifSound();
+    } else {
+        pendingNotifs.push(message);
     }
 
     setTimeout(() => div.remove(), 5000);
 }
 
+async function loadNotif() {
+    try {
+        const res = await fetch("/notifications.json?_=" + Date.now());
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        let data = await res.json();
+        const now = Date.now();
+
+        data = data.filter(item => item.enabled &&
+            (!item.expire || 
+            (now - parseInt(localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire)
+        );
+
+        badge.style.display = data.length ? 'inline-block' : 'none';
+        badge.textContent = data.length || "";
+
+        listEl.innerHTML = data.length 
+            ? data.map(item => `<li class="notif-item"><a href="${item.link || '#'}" target="_blank">${item.text}</a></li>`).join("") 
+            : "<li>Tidak ada notifikasi</li>";
+
+        data.forEach(item => {
+            const key = "notif_" + btoa(item.text);
+            if (!lastNotifKeys.has(key)) {
+                showNotification(item.text);
+                lastNotifKeys.add(key);
+                localStorage.setItem("notif_" + btoa(item.text), now);
+            }
+        });
+
+        localStorage.setItem("lastNotifKeys", JSON.stringify(Array.from(lastNotifKeys)));
+
+    } catch (e) {
+        console.error("Gagal load notifikasi", e);
+        listEl.innerHTML = "<li>Error load</li>";
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     loadNotif();
-    setInterval(loadNotif, 1000);
+    setInterval(loadNotif, 0);
 });
 
 // buka/tutup modal
@@ -148,7 +168,9 @@ window.addEventListener("click", e => { if (e.target === document.getElementById
 
 // ================== SERVICE WORKER ==================
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(reg => console.log('[SW] Registered', reg)).catch(err => console.error('[SW] Failed', err));
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('[SW] Registered', reg))
+        .catch(err => console.error('[SW] Failed', err));
 }
 
 // request permission notif
