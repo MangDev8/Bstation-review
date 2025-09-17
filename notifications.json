@@ -4,9 +4,10 @@
   "name": "[INST2-RMX-Admin-Web]",
   "text": "update terbaru, pembaruan dan penambahan tag text pada genre dan juga perbaikan warna pada halaman web, untuk penambahan judul judul anime nanti akan menyusul ya, sabar gess!",
   "link": "",
-  "expire": 1,
-  "enabled": true,
-  "created": "2025-09-16T10:00:00Z"
+  "expire": 0,
+  "enabled": false,
+  "created": "2025-09-16T10:00:00Z", 
+  "version":"1.2.0"
 }, 
   
   {
@@ -16,5 +17,13 @@
     "expire": 1,
     "enabled": true,
     "created": "2025-09-16T10:00:00Z"
-  }
+  },
+    {
+    "name": "[INST2-RMX-Admin-Web]",
+    "text": "test masuk gak notif nya ges",
+    "link": "",
+    "expire": 1,
+    "enabled": true,
+    "created": "2025-09-16T10:00:00Z"
+    }
 ]
