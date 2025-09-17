@@ -47,15 +47,15 @@ let userInteracted = false;
 
 music.addEventListener('canplaythrough', () => console.log("Audio musik siap dimainkan"));
 
+// fade in / fade out musik
 function fadeIn(audio, targetVolume = 0.3, step = 0.01, interval = 200) {
     audio.volume = 0;
-    audio.play().catch(() => console.log("Audio play diblokir browser"));
+    audio.play().catch(() => console.log("Audio musik diblokir browser"));
     const fade = setInterval(() => {
         if (audio.volume < targetVolume) audio.volume = Math.min(audio.volume + step, targetVolume);
         else clearInterval(fade);
     }, interval);
 }
-
 function fadeOut(audio, step = 0.01, interval = 200, callback) {
     const fade = setInterval(() => {
         if (audio.volume > 0) audio.volume = Math.max(audio.volume - step, 0);
@@ -66,7 +66,7 @@ function fadeOut(audio, step = 0.01, interval = 200, callback) {
 function playMusic() { fadeIn(music); bubble.textContent = "⏸"; bubble.classList.add("playing"); isPlaying = true; }
 function pauseMusic() { fadeOut(music, 0.01, 200, () => { bubble.textContent = "🎧"; bubble.classList.remove("playing"); isPlaying = false; }); }
 
-bubble.addEventListener("click", () => { isPlaying ? pauseMusic() : playMusic(); });
+['click','touchstart'].forEach(evt => bubble.addEventListener(evt, () => { isPlaying ? pauseMusic() : playMusic(); }));
 
 // ================== DROPDOWN ==================
 document.querySelectorAll('.dropdown').forEach(drop => {
@@ -83,40 +83,57 @@ document.querySelectorAll('.dropdown').forEach(drop => {
 
 // ================== NOTIFIKASI ==================
 let lastNotifKeys = new Set(JSON.parse(localStorage.getItem("lastNotifKeys") || "[]"));
-let pendingNotifs = [];
+const notifQueue = [];
+let isPlayingNotif = false;
+
 const notifSound = document.getElementById("notifSound");
 const badge = document.getElementById("notif-badge");
 const listEl = document.getElementById("notif-list");
 
-// User gesture pertama
-document.addEventListener('click', () => {
-    userInteracted = true;
-    pendingNotifs.forEach(() => playNotifSound());
-    pendingNotifs = [];
-}, { once: true });
+// User gesture pertama untuk unlock audio
+['click','touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        if (!userInteracted) {
+            userInteracted = true;
+            processNotifQueue();
+        }
+    }, { once: true });
+});
 
-function playNotifSound() {
-    if (!notifSound) return;
-    notifSound.volume = 0.5;
-    notifSound.currentTime = 0;
-    notifSound.play().catch(() => console.log("Audio notif diblokir oleh browser"));
+function enqueueNotif(message) {
+    notifQueue.push(message);
+    processNotifQueue();
 }
 
-function showNotification(message) {
+function processNotifQueue() {
+    if (!userInteracted || isPlayingNotif || notifQueue.length === 0) return;
+
+    isPlayingNotif = true;
+    const message = notifQueue.shift();
+
     const div = document.createElement("div");
     div.className = "notif-toast";
     div.textContent = message;
     document.body.appendChild(div);
 
-    if (userInteracted) {
-        playNotifSound();
-    } else {
-        pendingNotifs.push(message);
+    if (notifSound) {
+        notifSound.volume = 0.5;
+        notifSound.currentTime = 0;
+        notifSound.play().catch(() => console.log("Audio notif diblokir browser"));
     }
 
-    setTimeout(() => div.remove(), 5000);
+    setTimeout(() => {
+        div.remove();
+        isPlayingNotif = false;
+        processNotifQueue();
+    }, 800);
 }
 
+function showNotification(message) {
+    enqueueNotif(message);
+}
+
+// ================== LOAD NOTIF ==================
 async function loadNotif() {
     try {
         const res = await fetch("/notifications.json?_=" + Date.now());
@@ -125,8 +142,7 @@ async function loadNotif() {
         const now = Date.now();
 
         data = data.filter(item => item.enabled &&
-            (!item.expire || 
-            (now - parseInt(localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire)
+            (!item.expire || (now - parseInt(localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire)
         );
 
         badge.style.display = data.length ? 'inline-block' : 'none';
@@ -158,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(loadNotif, 5000);
 });
 
-// buka/tutup modal
+// buka/tutup modal notif
 window.openNotif = function() {
     document.getElementById("notifModal").style.display = "flex";
     badge.style.display = "none"; badge.textContent = "";
@@ -178,18 +194,12 @@ if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
 
-// User gesture untuk audio notif & musik
-['click', 'touchstart'].forEach(evt => {
-    document.addEventListener(evt, () => {
-        if (!userInteracted) {
-            userInteracted = true;
-            pendingNotifs.forEach(() => playNotifSound());
-            pendingNotifs = [];
-        }
-    }, { once: true });
-});
-
-// Bubble musik support touch di mobile
-['click', 'touchstart'].forEach(evt => {
-    bubble.addEventListener(evt, () => { isPlaying ? pauseMusic() : playMusic(); });
-});
+// ===== Tombol Test Notifikasi =====
+const testBtn = document.getElementById("testNotifBtn");
+if (testBtn) {
+    testBtn.addEventListener("click", () => {
+        const msg = "🔔 Ini notifikasi percobaan!";
+        showNotification(msg);
+        console.log("Test notif dikirim:", msg);
+    });
+}
