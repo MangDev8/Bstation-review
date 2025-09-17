@@ -137,7 +137,7 @@ function showNotification(message) {
     notif.textContent = message;
     document.body.appendChild(notif);
     if (notifSound) {
-        notifSound.volume = 0.5;
+        notifSound.volume = 1;
         notifSound.play().catch(err => console.log("Gagal mainkan audio:", err));
     }
     setTimeout(() => notif.remove(), 5000);
@@ -145,7 +145,7 @@ function showNotification(message) {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNotif();
-    setInterval(loadNotif, 1000);
+    setInterval(loadNotif, 10);
 });
 
 // buka/tutup modal
@@ -163,14 +163,3 @@ if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
 
-// Di main.js
-window.openNotif = function() {
-    document.getElementById("notifModal").style.display = "flex";
-    const badge = document.getElementById("notif-badge");
-    badge.style.display = "none";
-    badge.textContent = "";
-};
-
-window.closeNotif = function() {
-    document.getElementById("notifModal").style.display = "none";
-};
