@@ -508,7 +508,7 @@ footer {
   
   .badge-3 {
     background: green;
-    color: white;
+    color: #fff;
     font-size: 12px;
     padding: 3px 7px;
     border-radius: 4px;
@@ -518,7 +518,7 @@ footer {
   
   .desc {
     font-size: 14px;
-    color: #fff;
+    
     margin: 10px 0;
     padding: 10px;
   }
@@ -672,3 +672,18 @@ footer {
 }
 
 
+/*text gebre*/
+
+.text-genre {
+  font-display: center;
+  justify-content: center;
+  
+}
+
+.R3 {
+  font-weight: bold;
+}
+
+p{
+  color: var(--muted);
+}
