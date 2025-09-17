@@ -151,7 +151,7 @@ async function loadNotif() {
                 <div class="notif-item">
                     <strong class="notif-name">${item.name}</strong>
                     <p class="notif-text">${item.text}</p>
-                    ${item.version ? `<span class="notif-version">Versi: ${item.version}</span>` : ""}
+                    ${item.version ? `<span class="notif-version">Versi Web Saat ini: ${item.version}</span>` : ""}
                     ${item.link ? `<a href="${item.link}" target="_blank" class="notif-link">Klik disini</a>` : ""}
                 </div>
             `).join("")
