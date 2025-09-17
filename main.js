@@ -155,7 +155,7 @@ async function loadNotif() {
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNotif();
-    setInterval(loadNotif, 0);
+    setInterval(loadNotif, 5000);
 });
 
 // buka/tutup modal
