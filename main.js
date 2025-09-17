@@ -141,17 +141,27 @@ async function loadNotif() {
         let data = await res.json();
         const now = Date.now();
 
+        // Filter notifikasi aktif & belum expired
         data = data.filter(item => item.enabled &&
             (!item.expire || (now - parseInt(localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire)
         );
 
+        // Update badge
         badge.style.display = data.length ? 'inline-block' : 'none';
         badge.textContent = data.length || "";
 
+        // Render notifikasi
         listEl.innerHTML = data.length 
-            ? data.map(item => `<li class="notif-item"><a href="${item.link || '#'}" target="_blank">${item.text}</a></li>`).join("") 
-            : "<li>Tidak ada notifikasi</li>";
+            ? data.map(item => `
+                <div class="notif-item">
+                    <strong class="notif-name">${item.name}</strong>
+                    <p class="notif-text">${item.text}</p>
+                    ${item.link ? `<a href="${item.link}" target="_blank" class="notif-link">Klik disini</a>` : ""}
+                </div>
+            `).join("")
+            : "<p style='color:gray;'>Tidak ada notifikasi</p>";
 
+        // Show toast untuk notifikasi baru
         data.forEach(item => {
             const key = "notif_" + btoa(item.text);
             if (!lastNotifKeys.has(key)) {
@@ -165,7 +175,7 @@ async function loadNotif() {
 
     } catch (e) {
         console.error("Gagal load notifikasi", e);
-        listEl.innerHTML = "<li>Error load</li>";
+        listEl.innerHTML = "<p>Error load</p>";
     }
 }
 
@@ -193,3 +203,4 @@ if ('serviceWorker' in navigator) {
 if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
+
