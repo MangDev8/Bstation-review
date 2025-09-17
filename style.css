@@ -687,3 +687,11 @@ footer {
 p{
   color: var(--muted);
 }
+
+
+.notif-version {
+  display: block;
+  font-size: 12px;
+  color: #6ee7b7;
+  margin-top: 4px;
+}

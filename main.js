@@ -47,7 +47,6 @@ let userInteracted = false;
 
 music.addEventListener('canplaythrough', () => console.log("Audio musik siap dimainkan"));
 
-// fade in / fade out musik
 function fadeIn(audio, targetVolume = 0.3, step = 0.01, interval = 200) {
     audio.volume = 0;
     audio.play().catch(() => console.log("Audio musik diblokir browser"));
@@ -90,7 +89,6 @@ const notifSound = document.getElementById("notifSound");
 const badge = document.getElementById("notif-badge");
 const listEl = document.getElementById("notif-list");
 
-// User gesture pertama untuk unlock audio
 ['click','touchstart'].forEach(evt => {
     document.addEventListener(evt, () => {
         if (!userInteracted) {
@@ -141,31 +139,29 @@ async function loadNotif() {
         let data = await res.json();
         const now = Date.now();
 
-        // Filter notifikasi aktif & belum expired
         data = data.filter(item => item.enabled &&
             (!item.expire || (now - parseInt(localStorage.getItem("notif_" + btoa(item.text)) || now)) / 3600000 <= item.expire)
         );
 
-        // Update badge
         badge.style.display = data.length ? 'inline-block' : 'none';
         badge.textContent = data.length || "";
 
-        // Render notifikasi
         listEl.innerHTML = data.length 
             ? data.map(item => `
                 <div class="notif-item">
                     <strong class="notif-name">${item.name}</strong>
                     <p class="notif-text">${item.text}</p>
+                    ${item.version ? `<span class="notif-version">Versi: ${item.version}</span>` : ""}
                     ${item.link ? `<a href="${item.link}" target="_blank" class="notif-link">Klik disini</a>` : ""}
                 </div>
             `).join("")
             : "<p style='color:gray;'>Tidak ada notifikasi</p>";
 
-        // Show toast untuk notifikasi baru
         data.forEach(item => {
             const key = "notif_" + btoa(item.text);
             if (!lastNotifKeys.has(key)) {
-                showNotification(item.text);
+                const notifMsg = item.version ? `[v${item.version}] ${item.text}` : item.text;
+                showNotification(notifMsg);
                 lastNotifKeys.add(key);
                 localStorage.setItem("notif_" + btoa(item.text), now);
             }
@@ -199,8 +195,6 @@ if ('serviceWorker' in navigator) {
         .catch(err => console.error('[SW] Failed', err));
 }
 
-// request permission notif
 if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
-
