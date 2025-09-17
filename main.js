@@ -137,15 +137,15 @@ function showNotification(message) {
     notif.textContent = message;
     document.body.appendChild(notif);
     if (notifSound) {
-        notifSound.volume = 1;
+        notifSound.volume = 0.5;
         notifSound.play().catch(err => console.log("Gagal mainkan audio:", err));
     }
-    setTimeout(() => notif.remove(), 5000);
+    setTimeout(() => notif.remove(), 0);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNotif();
-    setInterval(loadNotif, 10);
+    setInterval(loadNotif, 0);
 });
 
 // buka/tutup modal
