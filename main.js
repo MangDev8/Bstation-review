@@ -43,20 +43,25 @@ onMessage(messaging, payload => {
 const bubble = document.getElementById("musicBubble");
 const music = document.getElementById("bgMusic");
 let isPlaying = false;
+let userInteracted = false;
 
-// pastikan musik sudah bisa di-play
-music.addEventListener('canplaythrough', () => console.log("Audio siap dimainkan"));
+// pastikan musik & notif audio sudah bisa di-play
+music.addEventListener('canplaythrough', () => console.log("Audio musik siap dimainkan"));
+const notifSound = document.getElementById("notifSound");
+notifSound.addEventListener('canplaythrough', () => console.log("Audio notif siap dimainkan"));
 
-// fade in
+// User gesture pertama
+document.addEventListener('click', () => { userInteracted = true; }, { once: true });
+
+// fade in / fade out
 function fadeIn(audio, targetVolume = 0.3, step = 0.01, interval = 200) {
     audio.volume = 0;
+    audio.play().catch(() => console.log("Audio play diblokir browser"));
     const fade = setInterval(() => {
         if (audio.volume < targetVolume) audio.volume = Math.min(audio.volume + step, targetVolume);
         else clearInterval(fade);
     }, interval);
 }
-
-// fade out
 function fadeOut(audio, step = 0.01, interval = 200, callback) {
     const fade = setInterval(() => {
         if (audio.volume > 0) audio.volume = Math.max(audio.volume - step, 0);
@@ -64,26 +69,10 @@ function fadeOut(audio, step = 0.01, interval = 200, callback) {
     }, interval);
 }
 
-function playMusic() {
-    if (!music.src) return console.error("Audio source tidak ditemukan!");
-    music.play().then(() => {
-        bubble.textContent = "⏸";
-        bubble.classList.add("playing");
-        isPlaying = true;
-        fadeIn(music);
-    }).catch(err => console.log("Klik balon untuk nyalain musik.", err));
-}
+function playMusic() { fadeIn(music); bubble.textContent = "⏸"; bubble.classList.add("playing"); isPlaying = true; }
+function pauseMusic() { fadeOut(music, 0.01, 200, () => { bubble.textContent = "🎧"; bubble.classList.remove("playing"); isPlaying = false; }); }
 
-function pauseMusic() {
-    fadeOut(music, 0.01, 200, () => {
-        bubble.textContent = "🎧";
-        bubble.classList.remove("playing");
-        isPlaying = false;
-    });
-}
-
-// event klik user
-bubble.addEventListener("click", () => isPlaying ? pauseMusic() : playMusic());
+bubble.addEventListener("click", () => { isPlaying ? pauseMusic() : playMusic(); });
 
 // ================== DROPDOWN ==================
 document.querySelectorAll('.dropdown').forEach(drop => {
@@ -99,7 +88,6 @@ document.querySelectorAll('.dropdown').forEach(drop => {
 });
 
 // ================== NOTIFIKASI ==================
-const notifSound = document.getElementById("notifSound");
 const badge = document.getElementById("notif-badge");
 const listEl = document.getElementById("notif-list");
 let lastNotifKeys = new Set();
@@ -132,25 +120,30 @@ async function loadNotif() {
 }
 
 function showNotification(message) {
-    const notif = document.createElement("div");
-    notif.className = "notif-toast";
-    notif.textContent = message;
-    document.body.appendChild(notif);
-    if (notifSound) {
+    const div = document.createElement("div");
+    div.className = "notif-toast";
+    div.textContent = message;
+    document.body.appendChild(div);
+
+    if (notifSound && userInteracted) {
         notifSound.volume = 0.5;
-        notifSound.play().catch(err => console.log("Gagal mainkan audio:", err));
+        notifSound.play().catch(() => console.log("Audio notif diblokir oleh browser"));
     }
-    setTimeout(() => notif.remove(), 0);
+
+    setTimeout(() => div.remove(), 5000);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     loadNotif();
-    setInterval(loadNotif, 0);
+    setInterval(loadNotif, 1000);
 });
 
 // buka/tutup modal
-function openNotif() { document.getElementById("notifModal").style.display = "flex"; badge.style.display = "none"; badge.textContent = ""; }
-function closeNotif() { document.getElementById("notifModal").style.display = "none"; }
+window.openNotif = function() {
+    document.getElementById("notifModal").style.display = "flex";
+    badge.style.display = "none"; badge.textContent = "";
+};
+window.closeNotif = function() { document.getElementById("notifModal").style.display = "none"; };
 window.addEventListener("click", e => { if (e.target === document.getElementById("notifModal")) closeNotif(); });
 
 // ================== SERVICE WORKER ==================
@@ -162,4 +155,3 @@ if ('serviceWorker' in navigator) {
 if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
-
