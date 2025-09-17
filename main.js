@@ -177,3 +177,19 @@ if ('serviceWorker' in navigator) {
 if ('Notification' in window && Notification.permission !== 'granted') {
     Notification.requestPermission().then(permission => console.log('Notification permission:', permission));
 }
+
+// User gesture untuk audio notif & musik
+['click', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        if (!userInteracted) {
+            userInteracted = true;
+            pendingNotifs.forEach(() => playNotifSound());
+            pendingNotifs = [];
+        }
+    }, { once: true });
+});
+
+// Bubble musik support touch di mobile
+['click', 'touchstart'].forEach(evt => {
+    bubble.addEventListener(evt, () => { isPlaying ? pauseMusic() : playMusic(); });
+});
